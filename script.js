@@ -691,13 +691,11 @@ function showNotification(title, message, icon) {
 }
 
 function setupAudio() {
-    // Simple Web Audio API tones
-    gameSounds = {
-        choice: () => playTone(523.25, 0.2),
-        roundStart: () => playTone(659.25, 0.3),
-        positive: () => playTone(392, 0.2),
-        negative: () => playTone(311.13, 0.2)
-    };
+    // Simple Web Audio API tones - add handlers without overwriting the enabled flag
+    gameSounds.choice = () => playTone(523.25, 0.2);
+    gameSounds.roundStart = () => playTone(659.25, 0.3);
+    gameSounds.positive = () => playTone(392, 0.2);
+    gameSounds.negative = () => playTone(311.13, 0.2);
 }
 
 function playTone(frequency, duration) {
@@ -852,13 +850,30 @@ window.addEventListener("unhandledrejection", (event) => {
 
 // Start the game
 window.addEventListener("DOMContentLoaded", () => {
-    // Check if p5 is loaded
-    if (typeof createCanvas === 'undefined') {
-        console.error("p5.js not loaded!");
-        showNotification("Error", "p5.js library failed to load.", "❌");
-        return;
+    // Ensure p5 is available. If not, try to load it dynamically and then initialize.
+    function initWhenReady() {
+        if (typeof createCanvas !== 'undefined') {
+            setTimeout(setup, 100);
+            return;
+        }
+
+        // If p5 still not available, attempt to load from CDN
+        console.warn('p5.js not found, loading from CDN...');
+        showNotification('Loading', 'Loading p5.js library...', '🔄');
+
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js';
+        script.async = false;
+        script.onload = () => {
+            console.log('p5.js loaded dynamically');
+            setTimeout(setup, 100);
+        };
+        script.onerror = () => {
+            console.error('Failed to load p5.js from CDN');
+            showNotification('Error', 'Failed to load p5.js library.', '❌');
+        };
+        document.head.appendChild(script);
     }
-    
-    // Initialize
-    setTimeout(setup, 100);
+
+    initWhenReady();
 });
