@@ -2,43 +2,241 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Ecosystème Social — Ethical Survival Game</title>
+  <title>Ecosystème Social – Ethical Survival Game</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
   <!-- p5.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
- <!-- Firebase compat SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
-<!-- Your config -->
-<script src="firebase-config.js"></script>
+  <!-- Firebase COMPAT -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
+  <!-- Your Firebase config (MUST BE CREATED) -->
+  <script src="firebase-config.js"></script>
+
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+  <!-- Background Decoration -->
+  <div class="background-pattern"></div>
+  
+  <!-- Notifications Container -->
+  <div id="notifications"></div>
+  
   <div id="ui">
+    <!-- Top Header -->
     <div id="topbar">
-      <span id="status">Connecting...</span>
-      <button id="joinBtn">Join Game</button>
-    </div>
-
-    <div id="dilemmaCard" class="hidden">
-      <div id="dilemmaText"></div>
-      <div id="choices">
-        <button id="choiceA">A</button>
-        <button id="choiceB">B</button>
+      <div class="topbar-left">
+        <div id="logo">🌍 Ethical Ecosystem</div>
+        <div id="status" class="status-connected">Connecting...</div>
       </div>
-      <div id="timer">Time: <span id="timeLeft">20</span>s</div>
+      
+      <div class="topbar-right">
+        <div class="player-info">
+          <div class="player-color-preview" id="playerColorDisplay"></div>
+          <div class="player-name" id="playerNameDisplay">Player</div>
+        </div>
+        <button id="joinBtn" class="primary-btn">
+          <span class="btn-icon">🎮</span>
+          Join Game
+        </button>
+        <button id="soundToggle" class="icon-btn">🔊</button>
+      </div>
     </div>
 
-    <div id="legend">
-      <div>Health: <span id="healthVal">0</span></div>
-      <div id="playersCount">Players: 0</div>
+    <!-- Main Game Area -->
+    <div class="main-content">
+      <!-- Left Panel: Player Dashboard -->
+      <div id="playerDashboard" class="dashboard">
+        <div class="dashboard-header">
+          <h3>Player Dashboard</h3>
+          <div class="player-avatar" id="playerAvatar">
+            <div class="avatar-initial" id="avatarInitial">P</div>
+          </div>
+        </div>
+        
+        <div class="player-details">
+          <div class="player-id">
+            <small>ID:</small>
+            <span id="playerIdDisplay">p_xxxxxx</span>
+          </div>
+          <div class="player-name-input">
+            <input type="text" id="playerNameInput" placeholder="Enter your name" maxlength="20">
+          </div>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Rounds Played</div>
+            <div class="stat-value" id="roundsPlayed">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Eco Impact</div>
+            <div class="stat-value" id="ecoImpact">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Consistency</div>
+            <div class="stat-value" id="consistency">0%</div>
+          </div>
+        </div>
+        
+        <div class="achievements">
+          <h4>Achievements</h4>
+          <div id="achievementList" class="achievement-list">
+            <div class="achievement locked">
+              <span class="achievement-icon">🌱</span>
+              <div class="achievement-text">
+                <div class="achievement-name">First Decision</div>
+                <div class="achievement-desc">Make your first choice</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center: Game Canvas & Dilemma -->
+      <div class="game-center">
+        <!-- Ecosystem Health Bar -->
+        <div id="ecosystemHealth" class="health-container">
+          <div class="health-header">
+            <span class="health-icon" id="healthIcon">🌿</span>
+            <span class="health-label">Ecosystem Health</span>
+            <span class="health-value" id="healthVal">50%</span>
+          </div>
+          <div class="health-bar">
+            <div class="health-fill" id="healthFill"></div>
+          </div>
+          <div class="health-status" id="healthStatus">Connecting...</div>
+        </div>
+
+        <!-- Game Canvas -->
+        <div id="canvasHolder" class="canvas-container"></div>
+
+        <!-- Players Counter -->
+        <div id="playersCounter" style="text-align: center; margin: 10px 0; font-size: 0.9rem; color: #8892b0;">
+          <span id="playersCount">0 Players</span> online
+        </div>
+
+        <!-- Dilemma Card -->
+        <div id="dilemmaCard" class="dilemma-card hidden">
+          <div class="dilemma-header">
+            <div class="round-indicator">Round <span id="roundNumber">1</span></div>
+            <div class="players-choices">
+              <div class="choices-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" id="choicesProgress"></div>
+                </div>
+                <span id="choicesCount">0/0</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="dilemma-content">
+            <div id="dilemmaText" class="dilemma-text">
+              <div class="dilemma-category">🌱 ENVIRONMENTAL</div>
+              <p>Waiting for dilemma...</p>
+            </div>
+            
+            <div class="choices-grid">
+              <button id="choiceA" class="choice-btn">
+                <!-- Content will be filled by JS -->
+              </button>
+              
+              <button id="choiceB" class="choice-btn">
+                <!-- Content will be filled by JS -->
+              </button>
+            </div>
+          </div>
+          
+          <div class="dilemma-footer">
+            <div class="timer-container">
+              <div class="timer-icon">⏳</div>
+              <div class="timer-text">
+                Time remaining: <span id="timeLeft">30</span>s
+              </div>
+              <div class="timer-bar">
+                <div class="timer-fill" id="timerFill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel: Ecosystem Stats -->
+      <div id="ecosystemStats" class="dashboard">
+        <div class="dashboard-header">
+          <h3>Ecosystem Metrics</h3>
+          <div class="status-indicator" id="ecosystemStatus">🌿</div>
+        </div>
+        
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-icon">🌱</span>
+              <span class="metric-label">Ecology</span>
+            </div>
+            <div class="metric-value" id="ecoVal">10</div>
+            <div class="metric-bar">
+              <div class="metric-fill" id="ecoBar"></div>
+            </div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-icon">☁️</span>
+              <span class="metric-label">Pollution</span>
+            </div>
+            <div class="metric-value" id="pollutionVal">5</div>
+            <div class="metric-bar">
+              <div class="metric-fill" id="pollutionBar"></div>
+            </div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-icon">🤝</span>
+              <span class="metric-label">Inclusivity</span>
+            </div>
+            <div class="metric-value" id="inclusivityVal">10</div>
+            <div class="metric-bar">
+              <div class="metric-fill" id="inclusivityBar"></div>
+            </div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-icon">🔍</span>
+              <span class="metric-label">Transparency</span>
+            </div>
+            <div class="metric-value" id="transparencyVal">8</div>
+            <div class="metric-bar">
+              <div class="metric-fill" id="transparencyBar"></div>
+            </div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-icon">💡</span>
+              <span class="metric-label">Innovation</span>
+            </div>
+            <div class="metric-value" id="innovationVal">6</div>
+            <div class="metric-bar">
+              <div class="metric-fill" id="innovationBar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div id="canvasHolder"></div>
-
-<script type="module" src="script.js"></script>
+  <!-- Your Game Script -->
+  <script src="script.js"></script>
 </body>
 </html>
