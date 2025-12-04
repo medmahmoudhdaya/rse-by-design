@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Ecosystème Social — Ethical Survival Game</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- p5.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+ <!-- Firebase compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+<!-- Your config -->
+<script src="firebase-config.js"></script>
+
+</head>
+<body>
+  <div id="ui">
+    <div id="topbar">
+      <span id="status">Connecting...</span>
+      <button id="joinBtn">Join Game</button>
+    </div>
+
+    <div id="dilemmaCard" class="hidden">
+      <div id="dilemmaText"></div>
+      <div id="choices">
+        <button id="choiceA">A</button>
+        <button id="choiceB">B</button>
+      </div>
+      <div id="timer">Time: <span id="timeLeft">20</span>s</div>
+    </div>
+
+    <div id="legend">
+      <div>Health: <span id="healthVal">0</span></div>
+      <div id="playersCount">Players: 0</div>
+    </div>
+  </div>
+
+  <div id="canvasHolder"></div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>

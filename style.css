@@ -1,0 +1,8 @@
+body { margin:0; font-family: Inter, Arial, sans-serif; background:#111; color:#eee; overflow:hidden;}
+#ui { position:absolute; z-index:10; left:10px; top:10px; width:320px; }
+#topbar{ display:flex; gap:8px; align-items:center; }
+#dilemmaCard{ background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; margin-top:10px; }
+#choices button{ margin-right:8px; padding:10px 14px; border-radius:6px; background:#222; color:#fff; border:1px solid #333;}
+.hidden{ display:none; }
+#legend{ margin-top:8px; font-size:14px;}
+#canvasHolder canvas{ display:block; } /* p5 canvas */
